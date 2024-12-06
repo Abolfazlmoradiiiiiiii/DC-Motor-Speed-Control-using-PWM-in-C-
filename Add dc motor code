@@ -1,0 +1,61 @@
+#include <iostream>
+#include <thread>
+#include <chrono>
+using namespace std;
+
+// تابع شبیه‌سازی سیگنال PWM
+void pwmSignal(int dutyCycle, int durationMs) {
+    int highTime = dutyCycle * 10;  // مدت‌زمان روشن بودن (ms)
+    int lowTime = (100 - dutyCycle) * 10;  // مدت‌زمان خاموش بودن (ms)
+    int totalCycles = durationMs / 10;  // تعداد چرخه‌های PWM در کل مدت زمان
+
+    for (int i = 0; i < totalCycles; ++i) {
+        // سیگنال PWM روشن
+        cout << "PWM ON (Motor Running at " << dutyCycle << "% power)" << endl;
+        this_thread::sleep_for(chrono::milliseconds(highTime));
+
+        // سیگنال PWM خاموش
+        cout << "PWM OFF (Motor Stopped)" << endl;
+        this_thread::sleep_for(chrono::milliseconds(lowTime));
+    }
+}
+
+// تابع کنترل موتور
+void controlMotor() {
+    int dutyCycle, duration;
+
+    // دریافت مقدار Duty Cycle از کاربر
+    cout << "Enter the duty cycle (0-100%): ";
+    cin >> dutyCycle;
+
+    // بررسی محدودیت‌های Duty Cycle
+    if (dutyCycle < 0 || dutyCycle > 100) {
+        cout << "Invalid duty cycle! Must be between 0 and 100.\n";
+        return;
+    }
+
+    // دریافت مدت‌زمان عملکرد موتور
+    cout << "Enter the duration (in milliseconds): ";
+    cin >> duration;
+
+    // شبیه‌سازی کنترل موتور
+    cout << "Controlling motor with " << dutyCycle << "% duty cycle for " << duration << " ms.\n";
+    pwmSignal(dutyCycle, duration);
+}
+
+int main() {
+    cout << "=== DC Motor Speed Control System ===" << endl;
+
+    // کنترل موتور به صورت تعاملی
+    char choice;
+    do {
+        controlMotor();
+
+        cout << "\nDo you want to control the motor again? (y/n): ";
+        cin >> choice;
+
+    } while (choice == 'y' || choice == 'Y');
+
+    cout << "Exiting the motor control system. Goodbye!" << endl;
+    return 0;
+}
